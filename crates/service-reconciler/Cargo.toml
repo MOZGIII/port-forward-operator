@@ -1,0 +1,16 @@
+[package]
+name = "service-reconciler"
+version = "0.1.0"
+edition = "2021"
+license = "GPL-2.0-only"
+
+[dependencies]
+app-core = { version = "0.1", path = "../app-core" }
+
+derivative = "2"
+futures-util = "0.3"
+k8s-openapi = { version = "0.20.0", features = ["latest"] }
+kube = { version = "0.86.0", features = ["runtime", "derive"] }
+prometheus = "0.13"
+thiserror = "1"
+tracing = "0.1"
