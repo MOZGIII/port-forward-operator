@@ -1,0 +1,12 @@
+[package]
+name = "pcp-mapper"
+version = "0.1.0"
+edition = "2021"
+license = "GPL-2.0-only"
+
+[dependencies]
+app-core = { version = "0.1", path = "../app-core" }
+pcp-client = { version = "0.1", path = "../pcp-client" }
+
+anyhow = "1"
+tokio = "1"

@@ -1,0 +1,13 @@
+[package]
+name = "pcp-proto"
+version = "0.1.0"
+edition = "2021"
+license = "GPL-2.0-only"
+
+[dependencies]
+num_enum = "0.7"
+thiserror = "1"
+
+[dev-dependencies]
+rand = "0.8"
+rand_chacha = "0.3"

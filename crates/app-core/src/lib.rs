@@ -8,16 +8,15 @@ use std::borrow::Borrow;
 ///
 /// Provides the port mapping / forwarding mechanisms.
 pub trait PortManager {
-    /// The key to use for this registration.
-    type Key;
-
-    /// The ref to the key.
-    type KeyRef: Borrow<Self::Key> + ?Sized;
-
     /// The registration request type.
-    type RegistrationRequest<Key>;
+    type RegistrationRequest<'a>;
     /// The registration response type.
     type RegistrationResponse;
+
+    /// The unregistration request type.
+    type UnregistrationRequest<'a>;
+    /// The unregistration response type.
+    type UnregistrationResponse;
 
     /// An error that can possibly occur while doing the registration.
     type RegisterError;
@@ -29,14 +28,15 @@ pub trait PortManager {
     /// Idempotent for the same request.
     fn register(
         &self,
-        request: Self::RegistrationRequest<Self::Key>,
+        request: Self::RegistrationRequest<'_>,
     ) -> impl std::future::Future<Output = Result<Self::RegistrationResponse, Self::RegisterError>> + Send;
 
     /// Unregister an existing port forward.
     ///
-    /// Idempotent for the same key.
+    /// Idempotent for the same request.
     fn unregister(
         &self,
-        key: &Self::KeyRef,
-    ) -> impl std::future::Future<Output = Result<(), Self::UnregisterError>> + Send;
+        request: Self::UnregistrationRequest<'_>,
+    ) -> impl std::future::Future<Output = Result<Self::UnregistrationResponse, Self::UnregisterError>>
+           + Send;
 }

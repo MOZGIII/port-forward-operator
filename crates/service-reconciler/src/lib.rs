@@ -10,16 +10,16 @@ mod metrics;
 use self::metrics::Metrics;
 
 /// The type configuration used for this reconciler.
-pub trait Config: std::fmt::Debug {
+pub trait Config {
     /// The port manager to work with.
     type PortManager: app_core::PortManager<
-            Key = String,
-            KeyRef = str,
-            RegistrationRequest<String> = PortForwardMap,
-            RegistrationResponse = String,
-            RegisterError = Self::RegisterError,
-            UnregisterError = Self::UnregisterError,
-        > + std::fmt::Debug;
+        RegistrationRequest<'static> = PortForwardMap,
+        RegistrationResponse = String,
+        UnregistrationRequest<'static> = PortForwardMap,
+        UnregistrationResponse = (),
+        RegisterError = Self::RegisterError,
+        UnregisterError = Self::UnregisterError,
+    >;
 
     /// The type of an error that can occur at registration.
     type RegisterError: std::error::Error;
@@ -142,14 +142,14 @@ async fn reconcile_event<T: Config>(
             ))
         }
         kube::runtime::finalizer::Event::Cleanup(service) => {
-            let Some(ref key) = service.metadata.uid else {
+            let Some(request) = make_port_forward_map(service) else {
                 return Ok(kube::runtime::controller::Action::requeue(
                     std::time::Duration::from_secs(10),
                 ));
             };
 
             ctx.port_manager
-                .unregister(key)
+                .unregister(request)
                 .await
                 .map_err(ReconcileError::Unregister)?;
             Ok(kube::runtime::controller::Action::await_change())
